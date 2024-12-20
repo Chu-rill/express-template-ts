@@ -14,25 +14,25 @@ class AuthController {
     }
   }
 
-  async signup(req: Request, res: Response): Promise<Response> {
-    const { username, password, email } = req.body;
-    try {
-      const response = await userService.createUser(username, password, email);
-      if (response.error) {
-        return res.status(response.statusCode).json(response);
-      }
+  // async signup(req: Request, res: Response): Promise<Response> {
+  //   const { username, password, email } = req.body;
+  //   try {
+  //     const response = await userService.createUser(username, password, email);
+  //     if (response.error) {
+  //       return res.status(response.statusCode).json(response);
+  //     }
 
-      const data = {
-        subject: "Welcome to Express Template",
-        username: username,
-      };
-      await emailService.sendEmailWithTemplate(email, data);
-      return res.status(response.statusCode).send(response);
-    } catch (err) {
-      console.error("Signup error:", err);
-      return res.status(500).json({ message: "Internal server error" });
-    }
-  }
+  //     const data = {
+  //       subject: "Welcome to Express Template",
+  //       username: username,
+  //     };
+  //     await emailService.sendEmailWithTemplate(email, data);
+  //     return res.status(response.statusCode).send(response);
+  //   } catch (err) {
+  //     console.error("Signup error:", err);
+  //     return res.status(500).json({ message: "Internal server error" });
+  //   }
+  // }
 }
 
 export default new AuthController(); // Use ES module syntax to export
