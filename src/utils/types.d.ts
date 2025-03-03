@@ -1,9 +1,15 @@
-import { UserDocument } from "../component/user/User"; // Adjust the path to your UserDocument type
+import { Request } from "express";
 
+// Extend the Request interface
 declare global {
   namespace Express {
-    export interface Request {
-      user?: UserDocument; // Add the user property with the UserDocument type
+    interface Request {
+      user?: {
+        id: string;
+        username: string;
+        email: string;
+        profile: string;
+      };
     }
   }
 }

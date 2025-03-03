@@ -16,7 +16,7 @@ class AuthController {
   }
 
   async signup(req: Request, res: Response): Promise<Response> {
-    const { username, password, email } = req.body;
+    const { username, password, email, profile } = req.body;
     try {
       const response = await userService.createUser(req.body as SignUpDTO);
       if (response.error) {

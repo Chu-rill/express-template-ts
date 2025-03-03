@@ -1,22 +1,23 @@
-import mongoose from "mongoose";
+import { User } from "@prisma/client";
 
-// Define various response types
 export type LoginResponse = {
   status: string;
   error: boolean;
   statusCode: number;
-  user: { username: string; id: string };
+  data: { username: string; id: string };
   token?: string;
 };
-export type User = {
-  username: string;
-  email: string;
-};
+
 export type CreateUserResponse = {
   status: string;
   error: boolean;
   statusCode: number;
-  user: { username: string; email: string };
+  data: {
+    id: string;
+    username: string;
+    email: string;
+    profile: string;
+  };
 };
 
 export type DeleteUserResponse = {
@@ -33,24 +34,10 @@ export type GetUserResponse = {
   message: string;
   data?: User | null;
 };
-// substitute for extend
-export type UserDocument = mongoose.Document & {
-  username: string;
-  email: string;
-  password: string;
-  _id: mongoose.Types.ObjectId | String;
-};
 export type UserServiceResponse = {
   status: string;
-  statusCode: number; // Make statusCode optional
+  statusCode: number;
   message?: string;
   data?: any;
   error?: boolean;
 };
-
-// export interface UserDocument extends Document {
-//   username: string;
-//   email: string;
-//   password: string;
-//   _id: mongoose.Types.ObjectId;
-// }

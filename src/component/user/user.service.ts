@@ -13,11 +13,10 @@ import {
   CreateUserResponse,
   DeleteUserResponse,
   GetUserResponse,
-  User,
-  UserDocument,
 } from "./user.response";
 import cloudinary from "../../utils/cloudinary";
 import { SignUpDTO } from "../auth/auth.validation";
+import { User } from "@prisma/client";
 
 class UserService {
   async loginUser(
@@ -30,16 +29,13 @@ class UserService {
     | typeof defaultError
   > {
     try {
-      const user = (await userRepository.getUserByUsername(
-        username
-      )) as UserDocument;
+      const user = (await userRepository.getUserByUsername(username)) as User;
       if (!user) return doesNotExistError;
 
       const isPasswordCorrect = await comparePassword(password, user.password);
       if (!isPasswordCorrect) return passwordMismatchError;
 
-      const userId = user._id.toString();
-      const payload = { username: user.username, id: userId };
+      const payload = { username: user.username, id: user.id };
 
       const token = jwt.sign(payload, process.env.JWT_SECRET!, {
         expiresIn: process.env.JWT_LIFETIME,
@@ -49,7 +45,7 @@ class UserService {
         status: "success",
         error: false,
         statusCode: httpStatus.OK,
-        user: { username: user.username, id: userId }, // Ensure _id is a string
+        data: { username: user.username, id: user.id }, // Ensure _id is a string
         token,
       };
     } catch (error) {
@@ -68,11 +64,12 @@ class UserService {
       if (existingUser) return noDuplicateError;
 
       const hashedPassword = await encrypt(dto.password);
-      const { username, email, password } = dto;
+      const { username, email, password, profile } = dto;
       const user = await userRepository.createUser({
         username,
         email,
         password: hashedPassword,
+        profile,
       });
 
       if (!user) return defaultError;
@@ -81,7 +78,12 @@ class UserService {
         status: "success",
         error: false,
         statusCode: httpStatus.CREATED,
-        user: { username, email },
+        data: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          profile: user.profile,
+        },
       };
     } catch (error) {
       console.error(error);

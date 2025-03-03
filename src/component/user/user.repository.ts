@@ -1,23 +1,18 @@
-import User from "./User";
-import { Document } from "mongoose";
-// import { PrismaClient } from '@prisma/client';
-// const prisma = new PrismaClient();
-interface UserDocument extends Document {
-  username: string;
-  password: string;
-  email: string;
-  profile: string;
-}
+import { PrismaClient, User } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 class UserRepository {
   // Find all users
-  async findAll(): Promise<UserDocument[]> {
-    return await User.find();
+  async findAll(): Promise<User[]> {
+    return await prisma.user.findMany();
   }
 
   // Find user by ID
-  async findById(id: string): Promise<UserDocument | null> {
-    return await User.findById(id);
+  async findById(id: string): Promise<User | null> {
+    return await prisma.user.findUnique({
+      where: { id },
+    });
   }
 
   // Create a new user
@@ -25,38 +20,38 @@ class UserRepository {
     username,
     password,
     email,
+    profile,
   }: {
     username: string;
     password: string;
     email: string;
-  }): Promise<UserDocument> {
-    const user = await User.create({
-      username,
-      password,
-      email,
+    profile: string;
+  }): Promise<User> {
+    return await prisma.user.create({
+      data: { username, password, email, profile },
     });
-    return user;
   }
 
   // Update a user by ID
-  async update(
-    id: string,
-    updatedUser: Partial<UserDocument>
-  ): Promise<UserDocument | null> {
-    return await User.findByIdAndUpdate(id, updatedUser, {
-      new: true,
-      runValidators: true,
+  async update(id: string, updatedUser: Partial<User>): Promise<User | null> {
+    return await prisma.user.update({
+      where: { id },
+      data: updatedUser,
     });
   }
 
   // Delete a user by ID
-  async delete(id: string): Promise<UserDocument | null> {
-    return await User.findByIdAndDelete(id);
+  async delete(id: string): Promise<User | null> {
+    return await prisma.user.delete({
+      where: { id },
+    });
   }
 
   // Find user by username
-  async getUserByUsername(username: string): Promise<UserDocument | null> {
-    return await User.findOne({ username });
+  async getUserByUsername(username: string): Promise<User | null> {
+    return await prisma.user.findUnique({
+      where: { username },
+    });
   }
 }
 
